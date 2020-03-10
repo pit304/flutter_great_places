@@ -1,4 +1,4 @@
-package com.example.flutter_great_places
+package ro.petrencu.flutter.great_places
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity
