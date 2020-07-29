@@ -17,15 +17,16 @@ class PlaceDetailScreen extends StatelessWidget {
       ),
       body: Column(
         children: <Widget>[
-          Container(
-            height: 250,
-            width: double.infinity,
-            child: Image.file(
-              selectedPlace.image,
-              fit: BoxFit.cover,
+          if (selectedPlace.image != null)
+            Container(
+              height: 250,
               width: double.infinity,
+              child: Image.file(
+                selectedPlace.image,
+                fit: BoxFit.cover,
+                width: double.infinity,
+              ),
             ),
-          ),
           SizedBox(
             height: 10,
           ),

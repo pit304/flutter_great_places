@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_great_places/widgets/location_input.dart';
 import 'package:provider/provider.dart';
@@ -28,7 +29,10 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
   }
 
   void _savePlace() {
-    if (_titleController.text.isEmpty || _pickedImage == null || _pickedLocation == null) {
+    // for web, allow adding places without an image
+    if (_titleController.text.isEmpty ||
+        (!kIsWeb && _pickedImage == null) ||
+        _pickedLocation == null) {
       return;
     }
     Provider.of<GreatPlaces>(context, listen: false)

@@ -1,28 +1,37 @@
-import 'package:sqflite/sqflite.dart' as sql;
-import 'package:path/path.dart' as path;
-import 'package:sqflite/sqlite_api.dart';
+import 'package:flutter/foundation.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:sembast/sembast.dart';
+import 'package:sembast/sembast_io.dart';
+import 'package:sembast_web/sembast_web.dart';
 
 class DBHelper {
+  static StoreRef store = StoreRef<String, String>.main();
+  static DatabaseFactory factory =
+      kIsWeb ? databaseFactoryWeb : databaseFactoryIo;
+
   static Future<Database> database() async {
-    final dbPath = await sql.getDatabasesPath();
-    return sql.openDatabase(
-      path.join(dbPath, 'places.db'),
-      onCreate: (db, version) {
-        return db.execute(
-            'CREATE TABLE user_places(id TEXT PRIMARY KEY, title TEXT, image TEXT, loc_lat REAL, loc_lng REAL, address TEXT)');
-      },
-      version: 1,
-    );
+    var dbPath = 'places.db';
+    if (!kIsWeb) {
+      // get the application documents directory
+      var dir = await getApplicationDocumentsDirectory();
+      // make sure it exists
+      await dir.create(recursive: true);
+      // build the database path
+      dbPath = join(dir.path, 'places.db');
+    }
+    // Open the database
+    return factory.openDatabase(dbPath);
   }
 
-  static Future<void> insert(String table, Map<String, Object> data) async {
-    final db = await DBHelper.database();
-    await db.insert(table, data,
-        conflictAlgorithm: sql.ConflictAlgorithm.replace);
-  }
-
-  static Future<List<Map<String, dynamic>>> getData(String table) async {
+  static void insert(Map<String, Object> data) async {
     final db = await database();
-    return db.query(table);
+    await store.record(data['title']).put(db, data);
+  }
+
+  static Future<List<RecordSnapshot<dynamic, dynamic>>> getData() async {
+    final db = await database();
+    // Read the record
+    return store.find(db);
   }
 }
